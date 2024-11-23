@@ -1,7 +1,10 @@
 package com.mango.customer.infrastructure.adapter.out;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -17,28 +20,33 @@ import com.mango.customer.application.port.out.IUserRepositoryPort;
 *	AL SER UN ADAPTADOR PUEDE SER FACILMENTE REEMPLAZADO POR CUALQUIER OTRA BASE DE DATOS DE FORMA EFICIENTE SIN AFECTAR AL RESTO DEL SISTEMA
 * */
 public class UserRepositoryAdapter implements IUserRepositoryPort {
+	private HashMap<Long, UserEntity> users;
 
-	public UserRepositoryAdapter() {}
+	public UserRepositoryAdapter() {
+		users = new HashMap<>();
+	}
 	@Override
 	public UserEntity save(UserEntity user) {
-		return null;
+		users.put(user.getId(), user);
+		return user;
 	}
 
 	@Override
     public Optional<UserEntity> findById(Long userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        return Optional.ofNullable(users.get(userId));
 }
 
     @Override
     public Optional<UserEntity> findByEmail(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByEmail'");
+        return users.values().stream().filter(user -> user.getEmail().equals(email)).findFirst();
     }
 
 	@Override
 	public Optional<List<UserEntity>> findAll() {
-		return Optional.empty();
+		if (users.isEmpty()) {
+			return Optional.empty();
+		}
+		return Optional.of(users.values().stream().collect(Collectors.toList()));
 	}
 }
 

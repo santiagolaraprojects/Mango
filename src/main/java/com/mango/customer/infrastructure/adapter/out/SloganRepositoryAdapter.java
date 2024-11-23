@@ -1,5 +1,7 @@
 package com.mango.customer.infrastructure.adapter.out;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -10,17 +12,28 @@ import com.mango.customer.application.port.out.ISloganRepositoryPort;
 
 @Component
 public class SloganRepositoryAdapter implements ISloganRepositoryPort {
-
+	private HashMap<Long, SloganEntity> slogans;
+	private Long slogansId;
+	public SloganRepositoryAdapter() {
+		slogans = new HashMap<>();
+		slogansId = 0L;
+	}
     @Override
     public SloganEntity save(SloganEntity newSlogan) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        slogans.put(slogansId++, newSlogan);
+		return newSlogan;
     }
 
     @Override
     public List<SloganEntity> findByUserId(Long userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUserId'");
+		List<SloganEntity> result = new ArrayList<>();
+		for (SloganEntity slogan : slogans.values()) {
+			if (slogan.getUser() != null && userId.equals(slogan.getUser().getId())) {
+				result.add(slogan);
+			}
+		}
+
+		return result;
     }
 
 }

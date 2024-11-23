@@ -35,4 +35,8 @@ public class SloganEntity {
         this.slogan = slogan;
     }
 
+	public Long getId() {
+		return this.id;
+	}
+
 }

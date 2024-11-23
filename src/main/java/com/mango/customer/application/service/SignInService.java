@@ -24,7 +24,7 @@ public class SignInService implements ISignInUseCase{
 
         Optional<UserEntity> userOptional = userRepositoryPort.findByEmail(userDTO.getEmail());
 
-        if (userOptional.isEmpty()) {
+        if (userOptional.isPresent()) {
             throw new IllegalArgumentException("User already registered");
         }
 
