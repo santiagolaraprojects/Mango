@@ -21,13 +21,22 @@ import com.mango.customer.application.port.out.IUserRepositoryPort;
 * */
 public class UserRepositoryAdapter implements IUserRepositoryPort {
 	private HashMap<Long, UserEntity> users;
+	private Long userIds;
 
 	public UserRepositoryAdapter() {
 		users = new HashMap<>();
+		userIds = 0L;
 	}
 	@Override
 	public UserEntity save(UserEntity user) {
-		users.put(user.getId(), user);
+		if(user.getId() == null) {
+			userIds++;
+			user.setId(userIds);
+			users.put(userIds, user);
+		}
+		else {
+			users.put(user.getId(), user);
+		}
 		return user;
 	}
 
