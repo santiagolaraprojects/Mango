@@ -13,7 +13,7 @@ public class User {
 	private String email;
 
 	public User(Long id, String name, String lastName, String address, String city, String email) {
-		if(!EmailValidator.isValid(email)) throw new IllegalArgumentException("Invalid email");
+		if(!EmailValidator.isValid(email)) throw new IllegalArgumentException(ValidationMessages.EMAIL_INVALID);
 
 		this.id = id;
 		this.name = name;
@@ -25,7 +25,7 @@ public class User {
 
 	public void update(String name, String lastName, String address, String city, String email) {
 		if (!Objects.isNull(email) && !EmailValidator.isValid(email)) {
-			throw new IllegalArgumentException("Invalid email format");
+			throw new IllegalArgumentException(ValidationMessages.EMAIL_INVALID);
 		}
 		if (!Objects.isNull(name)) this.name = name;
 		if (!Objects.isNull(lastName)) this.lastName = lastName;
@@ -68,7 +68,7 @@ public class User {
 		return email;
 	}
 	public void setEmail(String email) {
-		if(EmailValidator.isValid(email)) throw new IllegalArgumentException("Invalid email");
+		if(EmailValidator.isValid(email)) throw new IllegalArgumentException(ValidationMessages.EMAIL_INVALID);
 		this.email = email;
 	}
 

@@ -6,21 +6,25 @@ import java.util.List;
 
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import com.mango.customer.application.port.out.ISloganRepositoryPort;
 
 @Component
 public class SloganRepositoryAdapter implements ISloganRepositoryPort {
+
 	private HashMap<Long, SloganEntity> slogans;
 	private Long slogansId;
+
 	public SloganRepositoryAdapter() {
 		slogans = new HashMap<>();
 		slogansId = 0L;
 	}
+
     @Override
     public SloganEntity save(SloganEntity newSlogan) {
-        slogans.put(slogansId++, newSlogan);
+		slogansId++;
+		newSlogan.setId(slogansId);
+        slogans.put(slogansId, newSlogan);
 		return newSlogan;
     }
 
@@ -35,6 +39,18 @@ public class SloganRepositoryAdapter implements ISloganRepositoryPort {
 
 		return result;
     }
+
+	@Override
+	public int countByUserId(Long userId) {
+		int result = 0;
+		for (SloganEntity slogan : slogans.values()) {
+			if (slogan.getUser() != null && userId.equals(slogan.getUser().getId())) {
+				result++;
+			}
+		}
+
+		return result;
+	}
 
 }
 

@@ -9,4 +9,5 @@ public interface ISloganRepositoryPort {
 
     List<SloganEntity> findByUserId(Long userId);
 
+	int countByUserId(Long userId);
 }

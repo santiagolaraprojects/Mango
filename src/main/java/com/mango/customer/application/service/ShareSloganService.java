@@ -1,8 +1,10 @@
 package com.mango.customer.application.service;
 
-import java.util.List;
 import java.util.Optional;
 
+import com.mango.common.exception.MaxSloganLimitExceededException;
+import com.mango.customer.domain.ValidationConstants;
+import com.mango.customer.domain.ValidationMessages;
 import com.mango.customer.infrastructure.adapter.out.UserEntity;
 import org.springframework.stereotype.Service;
 
@@ -32,10 +34,7 @@ public class ShareSloganService implements IShareSloganUseCase{
             throw new UserNotFoundException(userId);
         }
 
-        List<SloganEntity> userSlogans = sloganRepositoryPort.findByUserId(userId);
-        if (userSlogans.size() == 3) {
-            throw new IllegalArgumentException("User has already created 3 slogans.");
-        }
+		CheckSloganAmountExceded(userId);
 
         SloganEntity newSlogan = new SloganEntity();
         newSlogan.setSlogan(sloganText);
@@ -43,6 +42,14 @@ public class ShareSloganService implements IShareSloganUseCase{
 
 		SloganEntity result = sloganRepositoryPort.save(newSlogan);
 
-        return new SloganDTO(result.getUser().getId(), result.getSlogan());
+        return new SloganDTO(result.getId(), result.getSlogan());
     }
+
+	private void CheckSloganAmountExceded(Long userId) {
+		//Este tipo de operaciones se pueden calcular eficientemente en la propia Query a la BD evitando extraer excesiva información
+		int sloganCount = sloganRepositoryPort.countByUserId(userId);
+		if (sloganCount == ValidationConstants.MAX_USER_SLOGANS) {
+			throw new MaxSloganLimitExceededException(ValidationMessages.USER_SLOGANS_EXCEEDED);
+		}
+	}
 }

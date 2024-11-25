@@ -1,4 +1,6 @@
-/*
+/*	EJEMPLO DE USO DE JPA PARA UNA BASE DE DATOS
+
+
 package com.mango.customer.infrastructure.adapter.out;
 
 import com.mango.customer.application.port.out.IUserRepositoryPort;

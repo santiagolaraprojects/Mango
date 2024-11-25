@@ -1,5 +1,6 @@
 package com.mango.application.service;
 
+import com.mango.common.exception.ResourceNotFoundException;
 import com.mango.common.exception.UserNotFoundException;
 import com.mango.customer.application.dto.UserDTO;
 import com.mango.customer.application.port.out.IUserRepositoryPort;
@@ -35,7 +36,7 @@ public class QueryUserServiceTest {
 	@Test
 	void whenThereAreNoUsers_thenShouldThrowException() {
 		Mockito.when(repository.findAll()).thenReturn(Optional.empty());
-		assertThrows(UserNotFoundException.class, () -> service.getAllUsers());
+		assertThrows(ResourceNotFoundException.class, () -> service.getAllUsers());
 
 		verify(repository, times(1)).findAll();
 	}

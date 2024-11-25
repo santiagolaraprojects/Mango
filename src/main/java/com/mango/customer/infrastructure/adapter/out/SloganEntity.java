@@ -39,4 +39,5 @@ public class SloganEntity {
 		return this.id;
 	}
 
+	public void setId(Long slogansId) {this.id = slogansId;	}
 }
