@@ -1,12 +1,14 @@
 package com.mango.application.service;
 
 
+import com.mango.common.exception.UserAlreadyExistsException;
 import com.mango.common.exception.UserNotFoundException;
 import com.mango.customer.application.dto.UserDTO;
 import com.mango.customer.application.port.out.IUserRepositoryPort;
 import com.mango.customer.application.service.UpdateUserService;
 import com.mango.customer.infrastructure.adapter.out.UserEntity;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,10 +30,33 @@ public class UpdateUserServiceTest {
     @InjectMocks
     private UpdateUserService updateUserservice;
 
+	private static UserDTO userDTO;
+
+	private static UserEntity userEntity;
+
+	@BeforeAll
+	static void setUp() {
+		userDTO = new UserDTO(1L, "Test Name", "Test LastName", "Test Address", "Test City", "test@example.com");
+		userEntity = new UserEntity(1L, "Test Name", "Test LastName", "Test Address", "Test City", "test@example.com");
+	}
+
 	@Test
 	void whenUserDoesNotExist_thenThrowException() {
 		when(userRepository.findById(any(Long.class))).thenReturn(Optional.empty());
-		Assertions.assertThrows(UserNotFoundException.class, () -> updateUserservice.updateUser(1L, new UserDTO(1L, "Test Name", "Test LastName", "Test Address", "Test City", "test@example.com")));
+		Assertions.assertThrows(UserNotFoundException.class, () -> updateUserservice.updateUser(1L, userDTO));
+
+		verify(userRepository, times(1)).findById(any(Long.class));
+		verify(userRepository, times(0)).save(any(UserEntity.class));
+
+	}
+
+	@Test
+	void whenNewEmailIsAlreadyRegistered_thenThrowException() {
+		when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(userEntity));
+		UserEntity newUser = new UserEntity(0L, "Test Name", "Test LastName", "Test Address", "Test City", "test@test.com");
+
+		when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(newUser));
+		Assertions.assertThrows(UserAlreadyExistsException.class, () -> updateUserservice.updateUser(1L, userDTO));
 
 		verify(userRepository, times(1)).findById(any(Long.class));
 		verify(userRepository, times(0)).save(any(UserEntity.class));
@@ -40,9 +65,9 @@ public class UpdateUserServiceTest {
 
 	@Test
 	void whenEmailIsInvalid_thenShouldThrowException() {
-		UserDTO userDTO = new UserDTO(null, "Test Name", "Test LastName", "Test Address", "Test City", "test");
-		when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(new UserEntity(1L, "Test Name", "Test LastName", "Test Address", "Test City", "test@example.com")));
-		assertThrows(IllegalArgumentException.class, () -> updateUserservice.updateUser(1L, new UserDTO(1L, "Test Name", "Test LastName", "Test Address", "Test City", "test")));
+		userEntity.setEmail("");
+		when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(userEntity));
+		assertThrows(IllegalArgumentException.class, () -> updateUserservice.updateUser(1L, userDTO));
 
 		verify(userRepository, times(1)).findById(any(Long.class));
 		verify(userRepository, times(0)).save(any(UserEntity.class));
@@ -51,9 +76,8 @@ public class UpdateUserServiceTest {
 
 	@Test
 	void whenSuccess_thenUserIsUpdated() {
-		when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(new UserEntity(1L, "Test Name", "Test LastName", "Test Address", "Test City", "test@example.com")));
-		when(userRepository.save(any())).thenReturn(new UserEntity(1L, "Test Name", "Test LastName", "Test Address", "Test City", "test@example.com"));
-		UserDTO userDTO = new UserDTO(null, "Test Name", "Test LastName", "Test Address", "Test City", "test@example.com");
+		when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(userEntity));
+		when(userRepository.save(any())).thenReturn(userEntity);
 
 		UserDTO result = updateUserservice.updateUser(1L, userDTO);
 		Assertions.assertNotNull(result);
